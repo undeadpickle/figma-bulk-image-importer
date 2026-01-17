@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 11px;
+      color: var(--figma-color-text);
+      background: var(--figma-color-bg);
+      padding: 12px;
+      line-height: 1.4;
+    }
+
+    .section {
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-weight: 600;
+      font-size: 11px;
+      margin-bottom: 8px;
+      color: var(--figma-color-text);
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      color: var(--figma-color-text-secondary);
+      margin-bottom: 4px;
+    }
+
+    input, select {
+      width: 100%;
+      height: 30px;
+      padding: 0 8px;
+      border: 1px solid var(--figma-color-border);
+      border-radius: 6px;
+      background: var(--figma-color-bg);
+      color: var(--figma-color-text);
+      font-size: 11px;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--figma-color-border-brand);
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .row > * {
+      flex: 1;
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--figma-color-border);
+      border-radius: 8px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      background: var(--figma-color-bg-secondary);
+    }
+
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--figma-color-border-brand);
+      background: var(--figma-color-bg-brand-tertiary);
+    }
+
+    .drop-zone-icon {
+      width: 32px;
+      height: 32px;
+      margin: 0 auto 8px;
+      opacity: 0.5;
+    }
+
+    .drop-zone-text {
+      color: var(--figma-color-text-secondary);
+    }
+
+    .drop-zone-text strong {
+      color: var(--figma-color-text-brand);
+    }
+
+    .file-info {
+      margin-top: 12px;
+    }
+
+    .file-count {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--figma-color-bg-success);
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--figma-color-text-success);
+    }
+
+    .file-count.warning {
+      background: var(--figma-color-bg-warning);
+      color: var(--figma-color-text-warning);
+    }
+
+    .file-count.error {
+      background: var(--figma-color-bg-danger);
+      color: var(--figma-color-text-danger);
+    }
+
+    .file-count-text {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .clear-btn {
+      background: none;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      opacity: 0.7;
+      transition: opacity 0.15s;
+    }
+
+    .clear-btn:hover {
+      opacity: 1;
+      background: rgba(0,0,0,0.1);
+    }
+
+    .skip-warning {
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: var(--figma-color-bg-warning);
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--figma-color-text-warning);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .skip-warning-icon {
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .skip-warning-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .skip-warning-list li {
+      margin-bottom: 2px;
+    }
+
+    .skip-warning-list li:last-child {
+      margin-bottom: 0;
+    }
+
+    .layout-options {
+      display: flex;
+      gap: 8px;
+    }
+
+    .layout-option {
+      flex: 1;
+      padding: 10px 8px;
+      border: 1px solid var(--figma-color-border);
+      border-radius: 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      background: var(--figma-color-bg);
+    }
+
+    .layout-option:hover {
+      border-color: var(--figma-color-border-brand);
+    }
+
+    .layout-option.selected {
+      border-color: var(--figma-color-border-brand);
+      background: var(--figma-color-bg-brand-tertiary);
+    }
+
+    .layout-option-icon {
+      width: 20px;
+      height: 20px;
+      margin: 0 auto 4px;
+      opacity: 0.7;
+    }
+
+    .layout-option.selected .layout-option-icon {
+      opacity: 1;
+    }
+
+    .custom-size {
+      display: none;
+      margin-top: 8px;
+    }
+
+    .custom-size.visible {
+      display: block;
+    }
+
+    .size-hint {
+      font-size: 10px;
+      color: var(--figma-color-text-warning);
+      margin-top: 4px;
+    }
+
+    .btn {
+      width: 100%;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--figma-color-bg-brand);
+      color: var(--figma-color-text-onbrand);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--figma-color-bg-brand-hover);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: var(--figma-color-bg-secondary);
+      color: var(--figma-color-text);
+    }
+
+    .btn-secondary:hover {
+      background: var(--figma-color-bg-tertiary);
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .progress-container {
+      display: none;
+      margin-top: 12px;
+    }
+
+    .progress-container.visible {
+      display: block;
+    }
+
+    .progress-bar-track {
+      height: 4px;
+      background: var(--figma-color-bg-tertiary);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--figma-color-bg-brand);
+      transition: width 0.2s ease;
+      width: 0%;
+    }
+
+    .progress-text {
+      margin-top: 8px;
+      font-size: 10px;
+      color: var(--figma-color-text-secondary);
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .progress-text.has-errors {
+      color: var(--figma-color-text-warning);
+    }
+
+    .placement-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      background: var(--figma-color-bg-secondary);
+      color: var(--figma-color-text-secondary);
+    }
+
+    .placement-info.inside-frame {
+      background: var(--figma-color-bg-brand-tertiary);
+      color: var(--figma-color-text-brand);
+    }
+
+    .placement-icon {
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="placement-info" id="placementInfo">
+    <svg class="placement-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+      <circle cx="7" cy="7" r="2" fill="currentColor"/>
+    </svg>
+    <span id="placementText">Component will be placed at (0, 0) on the current page</span>
+  </div>
+
+  <!-- File Selection -->
+  <div class="section">
+    <div class="section-title">Select Images</div>
+
+    <div class="row" style="margin-bottom: 8px;">
+      <div>
+        <label>File type filter</label>
+        <select id="fileTypeFilter">
+          <option value="all">All Supported</option>
+          <option value="png">PNG only</option>
+          <option value="jpg">JPG only</option>
+          <option value="gif">GIF only</option>
+          <option value="svg">SVG only</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="drop-zone" id="dropZone">
+      <svg class="drop-zone-icon" viewBox="0 0 32 32" fill="none">
+        <path d="M4 20V24C4 26.2091 5.79086 28 8 28H24C26.2091 28 28 26.2091 28 24V20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M16 4V20M16 20L10 14M16 20L22 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="drop-zone-text">
+        <strong>Click to select files</strong> or drag and drop<br>
+        PNG, JPG, GIF, SVG supported
+      </div>
+      <input type="file" id="fileInput" multiple accept=".png,.jpg,.jpeg,.gif,.svg" style="display: none;">
+    </div>
+
+    <div class="file-info hidden" id="fileInfo">
+      <div class="file-count" id="fileCount">
+        <span class="file-count-text">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M7 1L12.5 4V10L7 13L1.5 10V4L7 1Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            <path d="M5 7L6.5 8.5L9 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span id="fileCountText">0 images selected</span>
+        </span>
+        <button class="clear-btn" id="clearBtn">Clear</button>
+      </div>
+      <div class="skip-warning hidden" id="skipWarning">
+        <svg class="skip-warning-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 1L13 12H1L7 1Z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+          <path d="M7 5V7.5M7 10V10.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <strong>Some files were skipped:</strong>
+          <ul class="skip-warning-list" id="skipWarningList"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Layout -->
+  <div class="section">
+    <div class="section-title">Layout</div>
+    <div class="layout-options">
+      <div class="layout-option selected" data-layout="grid">
+        <svg class="layout-option-icon" viewBox="0 0 20 20" fill="none">
+          <rect x="2" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="12" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="2" y="12" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="12" y="12" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <div>Grid</div>
+      </div>
+      <div class="layout-option" data-layout="horizontal">
+        <svg class="layout-option-icon" viewBox="0 0 20 20" fill="none">
+          <rect x="1" y="6" width="5" height="8" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="7.5" y="6" width="5" height="8" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="14" y="6" width="5" height="8" rx="1" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <div>Horizontal</div>
+      </div>
+      <div class="layout-option" data-layout="vertical">
+        <svg class="layout-option-icon" viewBox="0 0 20 20" fill="none">
+          <rect x="6" y="1" width="8" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="6" y="7.5" width="8" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="6" y="14" width="8" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <div>Vertical</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Size -->
+  <div class="section">
+    <div class="section-title">Size</div>
+    <select id="sizePreset">
+      <option value="original">Original Size</option>
+      <option value="16">16 × 16</option>
+      <option value="24">24 × 24</option>
+      <option value="32">32 × 32</option>
+      <option value="40">40 × 40</option>
+      <option value="48" selected>48 × 48</option>
+      <option value="64">64 × 64</option>
+      <option value="80">80 × 80</option>
+      <option value="96">96 × 96</option>
+      <option value="128">128 × 128</option>
+      <option value="256">256 × 256</option>
+      <option value="512">512 × 512</option>
+      <option value="custom">Custom...</option>
+    </select>
+    <div class="custom-size" id="customSize">
+      <div class="row">
+        <div>
+          <label>Width</label>
+          <input type="number" id="customWidth" min="1" max="4096" value="48">
+        </div>
+        <div>
+          <label>Height</label>
+          <input type="number" id="customHeight" min="1" max="4096" value="48">
+        </div>
+      </div>
+      <div class="size-hint hidden" id="sizeHint">Values will be clamped to 1-4096</div>
+    </div>
+  </div>
+
+  <!-- Component Settings -->
+  <div class="section">
+    <div class="section-title">Component Settings</div>
+    <div style="margin-bottom: 8px;">
+      <label>Component name</label>
+      <input type="text" id="componentName" placeholder="e.g., Avatars">
+    </div>
+    <div class="row">
+      <div>
+        <label>Variant property name</label>
+        <input type="text" id="variantPropertyName" value="Type" placeholder="e.g., Type">
+      </div>
+      <div>
+        <label>Value prefix (optional)</label>
+        <input type="text" id="variantValuePrefix" placeholder="Uses filename if empty">
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-container" id="progressContainer">
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressText">Preparing...</div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+    <button class="btn btn-primary" id="importBtn" disabled>Import</button>
+  </div>
+
+  <script>
+    // State
+    let selectedFiles = [];
+    let selectedLayout = 'grid';
+    let isImporting = false;
+    let currentSkipInfo = { duplicates: 0, retina: 0, wrongType: 0, tooLarge: 0 };
+
+    // Elements
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileTypeFilter = document.getElementById('fileTypeFilter');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileCountEl = document.getElementById('fileCount');
+    const fileCountText = document.getElementById('fileCountText');
+    const clearBtn = document.getElementById('clearBtn');
+    const skipWarning = document.getElementById('skipWarning');
+    const skipWarningList = document.getElementById('skipWarningList');
+    const layoutOptions = document.querySelectorAll('.layout-option');
+    const sizePreset = document.getElementById('sizePreset');
+    const customSize = document.getElementById('customSize');
+    const customWidth = document.getElementById('customWidth');
+    const customHeight = document.getElementById('customHeight');
+    const sizeHint = document.getElementById('sizeHint');
+    const componentName = document.getElementById('componentName');
+    const variantPropertyName = document.getElementById('variantPropertyName');
+    const variantValuePrefix = document.getElementById('variantValuePrefix');
+    const importBtn = document.getElementById('importBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const placementInfo = document.getElementById('placementInfo');
+    const placementText = document.getElementById('placementText');
+
+    // File type accept strings
+    const fileTypeAccepts = {
+      all: '.png,.jpg,.jpeg,.gif,.svg',
+      png: '.png',
+      jpg: '.jpg,.jpeg',
+      gif: '.gif',
+      svg: '.svg'
+    };
+
+    // Constants
+    const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+    const MAX_FILE_SIZE_MB = 5;
+
+    // Helper: Extract base filename (strip extension and @2x/@3x)
+    function getBaseName(filename) {
+      let name = filename.replace(/\.[^/.]+$/, '');
+      name = name.replace(/@[123]x$/i, '');
+      name = name.replace(/[_-]?[123]x$/i, '');
+      return name;
+    }
+
+    // Helper: Get file extension
+    function getExtension(filename) {
+      const match = filename.match(/\.([^/.]+)$/);
+      return match ? match[1].toLowerCase() : '';
+    }
+
+    // Helper: Check if file matches current filter
+    function matchesFilter(filename) {
+      const ext = getExtension(filename);
+      const filter = fileTypeFilter.value;
+
+      if (filter === 'all') {
+        return ['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(ext);
+      }
+      if (filter === 'jpg') {
+        return ['jpg', 'jpeg'].includes(ext);
+      }
+      return ext === filter;
+    }
+
+    // Process selected files
+    async function processFiles(fileList) {
+      console.log('processFiles called with', fileList.length, 'files');
+      const filesArray = Array.from(fileList);
+      const validFiles = [];
+      const seenBaseNames = new Set();
+      let skippedDuplicates = 0;
+      let skippedRetina = 0;
+      let skippedWrongType = 0;
+      let skippedTooLarge = 0;
+
+      for (const file of filesArray) {
+        if (!matchesFilter(file.name)) {
+          skippedWrongType++;
+          continue;
+        }
+
+        if (file.size > MAX_FILE_SIZE_BYTES) {
+          skippedTooLarge++;
+          continue;
+        }
+
+        const baseName = getBaseName(file.name);
+
+        if (seenBaseNames.has(baseName.toLowerCase())) {
+          if (/@[123]x/i.test(file.name) || /[_-]?[123]x\./i.test(file.name)) {
+            skippedRetina++;
+          } else {
+            skippedDuplicates++;
+          }
+          continue;
+        }
+
+        seenBaseNames.add(baseName.toLowerCase());
+
+        const ext = getExtension(file.name);
+        const isSvg = ext === 'svg';
+
+        try {
+          let fileData;
+          if (isSvg) {
+            fileData = await file.text();
+          } else {
+            const arrayBuffer = await file.arrayBuffer();
+            fileData = new Uint8Array(arrayBuffer);
+          }
+
+          validFiles.push({
+            name: file.name,
+            baseName: baseName,
+            type: isSvg ? 'svg' : 'raster',
+            mimeType: file.type,
+            data: fileData
+          });
+        } catch (err) {
+          console.error(`Failed to read ${file.name}:`, err);
+        }
+      }
+
+      selectedFiles = validFiles;
+      currentSkipInfo = {
+        duplicates: skippedDuplicates,
+        retina: skippedRetina,
+        wrongType: skippedWrongType,
+        tooLarge: skippedTooLarge
+      };
+
+      console.log('processFiles complete, selectedFiles now has', selectedFiles.length, 'items');
+      updateFileDisplay();
+
+      // Auto-fill component name
+      if (selectedFiles.length > 0 && !componentName.value) {
+        const firstBaseName = selectedFiles[0].baseName;
+        const possibleName = firstBaseName.split(/[-_]/)[0];
+        if (possibleName && possibleName.length > 2) {
+          componentName.value = possibleName.charAt(0).toUpperCase() + possibleName.slice(1) + 's';
+        }
+      }
+
+      updateImportButton();
+    }
+
+    // Update file count and warning display
+    function updateFileDisplay() {
+      if (selectedFiles.length === 0) {
+        fileInfo.classList.add('hidden');
+        return;
+      }
+
+      fileInfo.classList.remove('hidden');
+
+      // Update count text
+      fileCountText.textContent = `${selectedFiles.length} image${selectedFiles.length !== 1 ? 's' : ''} selected`;
+
+      // Update count styling based on total
+      fileCountEl.classList.remove('warning', 'error');
+      if (selectedFiles.length > 200) {
+        fileCountEl.classList.add('error');
+        fileCountText.textContent += ' — Max 200!';
+      } else if (selectedFiles.length > 50) {
+        fileCountEl.classList.add('warning');
+        fileCountText.textContent += ' — Large import';
+      }
+
+      // Build skip warnings
+      const { duplicates, retina, wrongType, tooLarge } = currentSkipInfo;
+      const hasSkipped = duplicates > 0 || retina > 0 || wrongType > 0 || tooLarge > 0;
+
+      if (hasSkipped) {
+        skipWarning.classList.remove('hidden');
+        skipWarningList.innerHTML = '';
+
+        if (tooLarge > 0) {
+          const li = document.createElement('li');
+          li.textContent = `${tooLarge} file${tooLarge !== 1 ? 's' : ''} exceed ${MAX_FILE_SIZE_MB}MB limit`;
+          skipWarningList.appendChild(li);
+        }
+        if (wrongType > 0) {
+          const li = document.createElement('li');
+          li.textContent = `${wrongType} file${wrongType !== 1 ? 's' : ''} wrong type for filter`;
+          skipWarningList.appendChild(li);
+        }
+        if (duplicates > 0) {
+          const li = document.createElement('li');
+          li.textContent = `${duplicates} duplicate${duplicates !== 1 ? 's' : ''} removed`;
+          skipWarningList.appendChild(li);
+        }
+        if (retina > 0) {
+          const li = document.createElement('li');
+          li.textContent = `${retina} retina variant${retina !== 1 ? 's' : ''} (@2x/@3x) skipped`;
+          skipWarningList.appendChild(li);
+        }
+      } else {
+        skipWarning.classList.add('hidden');
+      }
+    }
+
+    // Clear selected files
+    function clearSelection() {
+      selectedFiles = [];
+      currentSkipInfo = { duplicates: 0, retina: 0, wrongType: 0, tooLarge: 0 };
+      fileInput.value = '';
+      fileInfo.classList.add('hidden');
+      componentName.value = '';
+      updateImportButton();
+    }
+
+    // Update import button state
+    function updateImportButton() {
+      const hasFiles = selectedFiles.length > 0;
+      const hasName = componentName.value.trim().length > 0;
+      const hasPropertyName = variantPropertyName.value.trim().length > 0;
+      const notTooMany = selectedFiles.length <= 200;
+
+      importBtn.disabled = !hasFiles || !hasName || !hasPropertyName || !notTooMany || isImporting;
+    }
+
+    // Validate and clamp custom size inputs
+    function validateSizeInput(input) {
+      const value = parseInt(input.value) || 0;
+      const needsClamp = value < 1 || value > 4096;
+
+      if (needsClamp) {
+        sizeHint.classList.remove('hidden');
+      }
+
+      // Check both inputs
+      const widthVal = parseInt(customWidth.value) || 0;
+      const heightVal = parseInt(customHeight.value) || 0;
+      const eitherInvalid = widthVal < 1 || widthVal > 4096 || heightVal < 1 || heightVal > 4096;
+
+      if (!eitherInvalid) {
+        sizeHint.classList.add('hidden');
+      }
+    }
+
+    // Drop zone events
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length > 0) {
+        processFiles(e.dataTransfer.files);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        processFiles(e.target.files);
+      }
+    });
+
+    // Clear button
+    clearBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      clearSelection();
+    });
+
+    // File type filter change
+    fileTypeFilter.addEventListener('change', () => {
+      fileInput.accept = fileTypeAccepts[fileTypeFilter.value];
+      if (fileInput.files.length > 0) {
+        processFiles(fileInput.files);
+      }
+    });
+
+    // Layout selection
+    layoutOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        layoutOptions.forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        selectedLayout = opt.dataset.layout;
+      });
+    });
+
+    // Size preset change
+    sizePreset.addEventListener('change', () => {
+      if (sizePreset.value === 'custom') {
+        customSize.classList.add('visible');
+      } else {
+        customSize.classList.remove('visible');
+        sizeHint.classList.add('hidden');
+        if (sizePreset.value !== 'original') {
+          customWidth.value = sizePreset.value;
+          customHeight.value = sizePreset.value;
+        }
+      }
+    });
+
+    // Custom size validation
+    customWidth.addEventListener('input', () => validateSizeInput(customWidth));
+    customHeight.addEventListener('input', () => validateSizeInput(customHeight));
+
+    // Input validation
+    componentName.addEventListener('input', updateImportButton);
+    variantPropertyName.addEventListener('input', updateImportButton);
+
+    // Cancel button
+    cancelBtn.addEventListener('click', () => {
+      parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*');
+    });
+
+    // Import button
+    importBtn.addEventListener('click', () => {
+      if (isImporting || selectedFiles.length === 0) return;
+
+      isImporting = true;
+      importBtn.disabled = true;
+      progressContainer.classList.add('visible');
+      progressBar.style.width = '0%';
+      progressText.textContent = 'Starting import...';
+      progressText.classList.remove('has-errors');
+
+      const useOriginalSize = sizePreset.value === 'original';
+      let targetWidth = Math.max(1, Math.min(4096, parseInt(customWidth.value) || 48));
+      let targetHeight = Math.max(1, Math.min(4096, parseInt(customHeight.value) || 48));
+
+      if (sizePreset.value !== 'original' && sizePreset.value !== 'custom') {
+        targetWidth = parseInt(sizePreset.value);
+        targetHeight = parseInt(sizePreset.value);
+      }
+
+      // Sanitize variant naming
+      const sanitizedPropertyName = variantPropertyName.value.trim().replace(/[=,\/]/g, '-');
+      const sanitizedValuePrefix = variantValuePrefix.value.trim().replace(/[=,\/]/g, '-');
+
+      parent.postMessage({
+        pluginMessage: {
+          type: 'import',
+          files: selectedFiles,
+          settings: {
+            componentName: componentName.value.trim(),
+            variantPropertyName: sanitizedPropertyName,
+            variantValuePrefix: sanitizedValuePrefix,
+            layout: selectedLayout,
+            targetWidth,
+            targetHeight,
+            useOriginalSize
+          }
+        }
+      }, '*');
+    });
+
+    // Receive messages from plugin
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+      if (!msg) return;
+
+      switch (msg.type) {
+        case 'selection-info':
+          if (msg.hasValidParent) {
+            placementText.textContent = `Will place inside "${msg.parentName}"`;
+            placementInfo.classList.add('inside-frame');
+          } else {
+            placementText.textContent = 'Will place at (0, 0) on current page';
+            placementInfo.classList.remove('inside-frame');
+          }
+          break;
+
+        case 'progress':
+          const percent = Math.round((msg.progress / msg.total) * 100);
+          progressBar.style.width = `${percent}%`;
+          let progressMessage = `Processing ${msg.progress}/${msg.total}: ${msg.currentFile}`;
+          if (msg.failedCount > 0) {
+            progressMessage += ` (${msg.failedCount} failed)`;
+            progressText.classList.add('has-errors');
+          }
+          progressText.textContent = progressMessage;
+          break;
+
+        case 'complete':
+          progressBar.style.width = '100%';
+          progressText.textContent = msg.message;
+          // Longer delay so user can read the message
+          setTimeout(() => {
+            parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*');
+          }, 3000);
+          break;
+
+        case 'error':
+          isImporting = false;
+          importBtn.disabled = false;
+          progressContainer.classList.remove('visible');
+          alert(msg.message);
+          break;
+      }
+    };
+  </script>
+</body>
+</html>
