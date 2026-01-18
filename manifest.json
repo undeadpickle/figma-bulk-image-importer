@@ -1,6 +1,6 @@
 {
-  "name": "Bulk Image Importer",
-  "id": "bulk-image-importer-component-set",
+  "name": "Batch Drop",
+  "id": "batch-drop",
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/ui.html",

@@ -1,4 +1,4 @@
-# Bulk Image Importer
+# Batch Drop
 
 A Figma plugin to import multiple images and automatically create a component set with variants.
 
@@ -50,7 +50,7 @@ npm run watch
 ## Usage
 
 1. **Optional:** Select a Section or Frame where you want the component placed
-2. Run the plugin from **Plugins** → **Development** → **Bulk Image Importer**
+2. Run the plugin from **Plugins** → **Development** → **Batch Drop**
 3. **Select images:**
    - Click the drop zone to open file picker, or drag and drop files
    - Use the filter dropdown to import only specific file types
@@ -79,7 +79,7 @@ For very large imports (100+), consider:
 ## File Structure
 
 ```
-bulk-image-importer/
+batch-drop/
 ├── manifest.json      # Figma plugin manifest
 ├── package.json       # Dependencies and scripts
 ├── tsconfig.json      # TypeScript config

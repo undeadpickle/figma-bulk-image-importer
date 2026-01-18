@@ -1,5 +1,5 @@
 {
-  "name": "bulk-image-importer",
+  "name": "batch-drop",
   "version": "1.0.0",
   "description": "Import multiple images and create a component set with variants",
   "scripts": {
